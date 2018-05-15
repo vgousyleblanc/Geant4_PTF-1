@@ -54,7 +54,7 @@ OpNovicePhysicsListMessenger::
   fVerboseCmd->SetParameterName("verbose",true);
   fVerboseCmd->SetDefaultValue(1);
   fVerboseCmd->SetRange("verbose>=0");
-  fVerboseCmd->AvailableForStates(G4State_PreInit);
+  //fVerboseCmd->AvailableForStates(G4State_PreInit);
  
   fCerenkovCmd =
            new G4UIcmdWithAnInteger("/OpNovice/phys/cerenkovMaxPhotons",this);

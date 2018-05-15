@@ -52,19 +52,18 @@ OpticalSurfaceDefinitions::OpticalSurfaceDefinitions(){
 }
 
 void OpticalSurfaceDefinitions::BuildSurfaces() {
-
-
+  
    const G4int NUM = 2;
    const G4int NUMENTRIES_water=60;
    const G4int NUMENTRIES_acrylic=306;
-
    
    //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
    // **** water *************************************************************************
    fSurfaces[ "water" ] = new G4OpticalSurface("Water");
    fSurfaces[ "water" ]->SetType(dielectric_dielectric);
    fSurfaces[ "water" ]->SetModel(unified); 
-   fSurfaces[ "water" ]->SetFinish(polished);
+   fSurfaces[ "water" ]->SetFinish(ground);
+
    fSurfaces[ "water" ]->SetSigmaAlpha(0.001);
    G4double ENERGY_water[NUMENTRIES_water] =
      { 1.56962*CLHEP::eV, 1.58974*CLHEP::eV, 1.61039*CLHEP::eV, 1.63157*CLHEP::eV, 
@@ -127,13 +126,38 @@ void OpticalSurfaceDefinitions::BuildSurfaces() {
    mySTWa->AddProperty("BACKSCATTERCONSTANT",   ENERGY_blacksheet, CBS_water,    NUM);
    fSurfaces[ "water" ]->SetMaterialPropertiesTable(mySTWa);
 
+   //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+   // **** air *************************************************************************
+   fSurfaces[ "air" ] = new G4OpticalSurface("Air");
+   fSurfaces[ "air" ]->SetType(dielectric_dielectric);
+   fSurfaces[ "air" ]->SetModel(unified);
+   fSurfaces[ "air" ]->SetFinish(polished);
+   G4double RINDEX_air[NUMENTRIES_water] = 
+     { 1.000275, 1.000275, 1.000275, 1.000275,
+       1.000275, 1.000275, 1.000275, 1.000275,
+       1.000276, 1.000276, 1.000276, 1.000276,
+       1.000276, 1.000276, 1.000276, 1.000276,
+       1.000277, 1.000277, 1.000277, 1.000277,
+       1.000277, 1.000277, 1.000277, 1.000277,
+       1.000278, 1.000278, 1.000278, 1.000278,
+       1.000279, 1.000279, 1.000279, 1.000279,
+       1.000280, 1.000280, 1.000280, 1.000280,
+       1.000281, 1.000281, 1.000281, 1.000281,
+       1.000282, 1.000283, 1.000284, 1.000285,
+       1.000286, 1.000287, 1.000288, 1.000290,
+       1.000291, 1.000292, 1.000293, 1.000295,
+       1.000296, 1.000299, 1.000301, 1.000304,
+       1.000308, 1.000312, 1.000316, 1.000320};
+   G4MaterialPropertiesTable *mySTAir = new G4MaterialPropertiesTable();
+   mySTAir->AddProperty("RINDEX",                ENERGY_water,      RINDEX_air, NUMENTRIES_water );
+   fSurfaces[ "air" ]->SetMaterialPropertiesTable(mySTAir);
    
    //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
    // **** blacksheet ***********************************************************************************
    fSurfaces[ "blacksheet" ] = new G4OpticalSurface("BlacksheetSurface");
    fSurfaces[ "blacksheet" ]->SetType(dielectric_dielectric);
    fSurfaces[ "blacksheet" ]->SetModel(unified); 
-   fSurfaces[ "blacksheet" ]->SetFinish(groundfrontpainted);
+   fSurfaces[ "blacksheet" ]->SetFinish(ground);
    fSurfaces[ "blacksheet" ]->SetSigmaAlpha(0.1);
    
    G4double RINDEX_blacksheet[NUM] = { 1.6, 1.6 };
@@ -206,6 +230,19 @@ void OpticalSurfaceDefinitions::BuildSurfaces() {
    fSurfaces[ "cathode" ]->SetFinish(polished);
    fSurfaces[ "cathode" ]->SetSigmaAlpha( 0.013 );
    fSurfaces[ "cathode" ]->SetMaterialPropertiesTable(myMPTcath);
+
+   //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+   // **** fiber reinforced plastic  ********************************************************************
+   fSurfaces[ "frp" ] = new G4OpticalSurface("PmtGlassSurface");
+   fSurfaces[ "frp" ]->SetType(dielectric_dielectric);
+   fSurfaces[ "frp" ]->SetModel(unified);  
+   fSurfaces[ "frp" ]->SetFinish(groundfrontpainted);
+   G4double ENERGY_frp[NUM]  = { 1.4*CLHEP::eV, 6.2*CLHEP::eV };
+   G4double REFLECT_frp[NUM] = { 0.5, 0.5 };
+   G4MaterialPropertiesTable *frpMPT = new G4MaterialPropertiesTable();
+   frpMPT->AddProperty("REFLECTIVITY",          ENERGY_frp, REFLECT_frp, NUM);
+   fSurfaces[ "frp" ]->SetMaterialPropertiesTable(frpMPT);
+
    
    
    //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -213,7 +250,7 @@ void OpticalSurfaceDefinitions::BuildSurfaces() {
    fSurfaces[ "pmtglass" ] = new G4OpticalSurface("PmtGlassSurface");
    fSurfaces[ "pmtglass" ]->SetType(dielectric_dielectric);
    fSurfaces[ "pmtglass" ]->SetModel(unified);  
-   fSurfaces[ "pmtglass" ]->SetFinish(polished);
+   fSurfaces[ "pmtglass" ]->SetFinish(ground);
    fSurfaces[ "pmtglass" ]->SetSigmaAlpha( 0.013 );
    G4double RGCFF = 0.32;
    G4double ENERGY_glass[NUM] = { 1.4*CLHEP::eV, 6.2*CLHEP::eV };
@@ -256,11 +293,17 @@ void OpticalSurfaceDefinitions::BuildSurfaces() {
 
    //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
    // **** reflector *************************************************************************
-   fSurfaces[ "reflector" ] = new G4OpticalSurface("polishedair");
-   fSurfaces[ "reflector" ]->SetType( dielectric_LUTDAVIS );
-   fSurfaces[ "reflector" ]->SetModel( DAVIS );
-   fSurfaces[ "reflector" ]->SetFinish( polishedair );
+   fSurfaces[ "reflector" ] = new G4OpticalSurface("reflector");
+   fSurfaces[ "reflector" ]->SetType( dielectric_metal );
+   fSurfaces[ "reflector" ]->SetModel( unified );
+   fSurfaces[ "reflector" ]->SetFinish( polished );
+   G4double ENE_refl[NUM] = {1.0*CLHEP::eV, 6.0*CLHEP::eV};
+   G4double REF_refl[NUM] = {0.95, 0.95};
+   G4MaterialPropertiesTable *mySTrefl = new G4MaterialPropertiesTable();
+   mySTrefl->AddProperty("REFLECTIVITY", ENE_refl, REF_refl, NUM);
+   fSurfaces[ "reflector" ]->SetMaterialPropertiesTable( mySTrefl );
 
+   
    //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
    // **** pmtsteel *************************************************************************
    fSurfaces[ "pmtsteel" ] = new G4OpticalSurface("pmtsteel");
@@ -275,10 +318,10 @@ void OpticalSurfaceDefinitions::BuildSurfaces() {
    
    //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
    // **** acrylic *************************************************************************
-   fSurfaces[ "acrylic" ] = new G4OpticalSurface("PmtGlassSurface");
+   fSurfaces[ "acrylic" ] = new G4OpticalSurface("AcrylicSurface");
    fSurfaces[ "acrylic" ]->SetType(dielectric_dielectric);
    fSurfaces[ "acrylic" ]->SetModel(unified);  
-   fSurfaces[ "acrylic" ]->SetFinish(polished);
+   fSurfaces[ "acrylic" ]->SetFinish(ground);
    fSurfaces[ "acrylic" ]->SetSigmaAlpha( 0.02 );
    G4double ENERGY_skAcrylic[NUMENTRIES_acrylic] =
      { 2.066*CLHEP::eV, 2.070*CLHEP::eV, 2.073*CLHEP::eV, 2.077*CLHEP::eV, 2.080*CLHEP::eV, 2.084*CLHEP::eV, 2.087*CLHEP::eV,
@@ -407,7 +450,9 @@ void OpticalSurfaceDefinitions::BuildSurfaces() {
    AcrPropTable->AddProperty("SPECULARSPIKECONSTANT", ENERGY_acrylic,   CSS_acrylic, NUM);
    AcrPropTable->AddProperty("BACKSCATTERCONSTANT",   ENERGY_acrylic,   CBS_acrylic, NUM);
    fSurfaces[ "acrylic" ]->SetMaterialPropertiesTable(AcrPropTable);
-  
+
+   
+   
 }
 
 

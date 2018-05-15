@@ -81,8 +81,10 @@ OpNovicePrimaryGeneratorAction::~OpNovicePrimaryGeneratorAction()
 void OpNovicePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   if ( fSourceType == "gun" ){
+    std::cout<<"OpNovicePrimaryGeneratorAction: using gun source"<<std::endl;
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } else if ( fSourceType == "gps" ) {
+    std::cout<<"OpNovicePrimaryGeneratorAction: using gps source"<<std::endl;
     fParticleGPS->GeneratePrimaryVertex(anEvent);
   }
 }
