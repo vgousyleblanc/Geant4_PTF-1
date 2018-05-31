@@ -182,7 +182,7 @@ int main(int argc,char** argv)
      if (ui->IsGUI())
         UImanager->ApplyCommand("/control/execute gui.mac");
 
-     //fdet->ReallyConstruct();
+     //fdet->ConstructSD();
      ui->SessionStart();
      delete ui;
 #endif

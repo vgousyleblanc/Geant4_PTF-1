@@ -40,40 +40,32 @@ public:
 
   /// Method to get overall region, plus the rotation and translation
   /// To subtract from other volumes.
-  void get_solid( G4VSolid & vol, G4RotationMatrix& rm, G4ThreeVector& loc ); 
+  //void get_solid( G4VSolid & vol, G4RotationMatrix& rm, G4ThreeVector& loc ); 
 
 
   /// Attach sensitive detector
-  void attachSD(){
-    // Add sensitive detector to Cathode
-    G4VPhysicalVolume * cath_phys = fVols[ "cathode" ];
-    G4LogicalVolume * cath_log = cath_phys->GetLogicalVolume();
-    std::cout<<"Building sensitive detector with name "<<cath_phys->GetName()<<std::endl;
-    fSD = new CathodeSD( cath_phys->GetName() );
-    cath_log->SetSensitiveDetector( fSD );
-    G4SDManager::GetSDMpointer()->ListTree();
-  }
-  
+  void attachSD();
+    
   /// Method to disable sensitive detector of this PMT
-  void disableSD( bool disable=true ){
-    G4String sdname = fSD->get_name(); 
-    G4SDManager::GetSDMpointer()->Activate( sdname, !disable );
-    delete fSD;
-  }
+  //void disableSD( bool disable=true ){
+  //  G4String sdname = fSD->get_name(); 
+  //  G4SDManager::GetSDMpointer()->Activate( sdname, !disable );
+    // delete fSD;
+  //}
 
   /// Method to remove physical volumes from parent
   ///
-  void Disable(){
-    fParent->RemoveDaughter( fVols[ "pmtglass" ] );
-    delete fVols[ "pmtglass"];
-    if ( fWithAcrylic ) {
-      fParent->RemoveDaughter( fVols[ "acrylic_dome"] );
-      fParent->RemoveDaughter( fVols[ "frp_cover"] );
-      delete fVols["acrylic_dome"];
-      delete fVols["frp_cover"];
-    }
-    if ( fSD != nullptr ) disableSD();
-  }
+  //void Disable(){
+  //  fParent->RemoveDaughter( fVols[ "pmtglass" ] );
+  //  delete fVols[ "pmtglass"];
+  //  if ( fWithAcrylic ) {
+  //    fParent->RemoveDaughter( fVols[ "acrylic_dome"] );
+  //    fParent->RemoveDaughter( fVols[ "frp_cover"] );
+  //    delete fVols["acrylic_dome"];
+  //    delete fVols["frp_cover"];
+  //  }
+    //if ( fSD != nullptr ) disableSD();
+  // }
   
 private:
   void Init();
@@ -105,7 +97,7 @@ private:
   std::map< std::string, G4VPhysicalVolume * > fVols;
 
   /// overall volume to use in subtraction from wherever this PMT is placed
-  G4VSolid * fSumSolid;
+  //G4VSolid * fSumSolid;
 
   /// Sensitive detector
   CathodeSD * fSD;

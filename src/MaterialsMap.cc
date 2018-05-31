@@ -30,9 +30,51 @@ MaterialsMap::MaterialsMap(){
   }
 }
 
+void MaterialsMap::ReadMaterials(){
+  
+  std::cout<<"MaterialsMap::ReadMaterials() starting "<<std::endl;
+  water_RAYFF = 0.625;
+  water_ABWFF = 1.0;
+  
+  std::ifstream infile( "ptf-materials.txt" );
+
+  if ( !infile ) {
+    std::cout<<"Could not open ptf-materials.txt, using default parameters"<<std::endl;
+    return;
+  }
+
+  std::string line;
+  while ( std::getline( infile, line ) ){
+    std::cout<<"Processing line: "<<line<<std::endl;
+    std::istringstream is( line );
+    std::string tag;
+
+    is >> tag;
+    if ( tag == "#" ){
+      continue;
+    } else if ( tag == "water_RAYFF" ) {
+      is >> water_RAYFF;
+      std::cout<<"MaterialsMap::ReadMaterials water_RAYFF = "<<water_RAYFF<<std::endl;
+    } else if ( tag == "water_ABWFF" ) {
+      is >> water_ABWFF;
+      std::cout<<"MaterialsMap::ReadMaterials water_ABWFF = "<<water_ABWFF<<std::endl;
+    } else if ( tag == "cathode_ABWFF" ) {
+      is >> cathode_ABWFF;
+      std::cout<<"MaterialsMap::ReadMaterials cathode_ABWFF = "<<cathode_ABWFF<<std::endl;
+    } else if ( tag == "glass_ABWFF" ) {
+      is >> glass_ABWFF;
+      std::cout<<"MaterialsMap::ReadMaterials glass_ABWFF = "<<glass_ABWFF<<std::endl;
+    } 
+  }
+
+}
+
 
 void MaterialsMap::BuildMaterials(){
   std::cout<<"MaterialsMap::BuildMaterials"<<std::endl;
+
+  ReadMaterials();
+  
   // pmtglass, pmtsteel, cathode, vacuum, acrylic
   G4NistManager* nist = G4NistManager::Instance();
 
@@ -242,7 +284,7 @@ void MaterialsMap::BuildMaterials(){
       1.38362, 1.39074, 1.39956, 1.41075, 1.42535};
    
 
-    G4double ABWFF = 1.0;
+    //G4double ABWFF = 1.0;
 
     // Get from the tuning parameters
     //ABWFF = WCSimTuningParams->GetAbwff();
@@ -250,18 +292,18 @@ void MaterialsMap::BuildMaterials(){
     //T. Akiri: Values from Skdetsim 
     G4double ABSORPTION_water[NUMENTRIES_water] =
       {
-        16.1419*CLHEP::cm*ABWFF,  18.278*CLHEP::cm*ABWFF, 21.0657*CLHEP::cm*ABWFF, 24.8568*CLHEP::cm*ABWFF, 30.3117*CLHEP::cm*ABWFF, 
-	38.8341*CLHEP::cm*ABWFF, 54.0231*CLHEP::cm*ABWFF, 81.2306*CLHEP::cm*ABWFF, 120.909*CLHEP::cm*ABWFF, 160.238*CLHEP::cm*ABWFF, 
-	193.771*CLHEP::cm*ABWFF, 215.017*CLHEP::cm*ABWFF, 227.747*CLHEP::cm*ABWFF,  243.85*CLHEP::cm*ABWFF, 294.036*CLHEP::cm*ABWFF, 
-	321.647*CLHEP::cm*ABWFF,  342.81*CLHEP::cm*ABWFF, 362.827*CLHEP::cm*ABWFF, 378.041*CLHEP::cm*ABWFF, 449.378*CLHEP::cm*ABWFF,
-        739.434*CLHEP::cm*ABWFF, 1114.23*CLHEP::cm*ABWFF, 1435.56*CLHEP::cm*ABWFF, 1611.06*CLHEP::cm*ABWFF, 1764.18*CLHEP::cm*ABWFF, 
-	2100.95*CLHEP::cm*ABWFF,  2292.9*CLHEP::cm*ABWFF, 2431.33*CLHEP::cm*ABWFF,  3053.6*CLHEP::cm*ABWFF, 4838.23*CLHEP::cm*ABWFF, 
-	6539.65*CLHEP::cm*ABWFF, 7682.63*CLHEP::cm*ABWFF, 9137.28*CLHEP::cm*ABWFF, 12220.9*CLHEP::cm*ABWFF, 15270.7*CLHEP::cm*ABWFF, 
-	19051.5*CLHEP::cm*ABWFF, 23671.3*CLHEP::cm*ABWFF, 29191.1*CLHEP::cm*ABWFF, 35567.9*CLHEP::cm*ABWFF,   42583*CLHEP::cm*ABWFF,
-        49779.6*CLHEP::cm*ABWFF, 56465.3*CLHEP::cm*ABWFF,   61830*CLHEP::cm*ABWFF, 65174.6*CLHEP::cm*ABWFF, 66143.7*CLHEP::cm*ABWFF,   
-	  64820*CLHEP::cm*ABWFF,   61635*CLHEP::cm*ABWFF, 57176.2*CLHEP::cm*ABWFF, 52012.1*CLHEP::cm*ABWFF, 46595.7*CLHEP::cm*ABWFF, 
-	41242.1*CLHEP::cm*ABWFF, 36146.3*CLHEP::cm*ABWFF, 31415.4*CLHEP::cm*ABWFF, 27097.8*CLHEP::cm*ABWFF, 23205.7*CLHEP::cm*ABWFF, 
-	19730.3*CLHEP::cm*ABWFF, 16651.6*CLHEP::cm*ABWFF, 13943.6*CLHEP::cm*ABWFF, 11578.1*CLHEP::cm*ABWFF, 9526.13*CLHEP::cm*ABWFF
+        16.1419*CLHEP::cm*water_ABWFF,  18.278*CLHEP::cm*water_ABWFF, 21.0657*CLHEP::cm*water_ABWFF, 24.8568*CLHEP::cm*water_ABWFF, 30.3117*CLHEP::cm*water_ABWFF, 
+	38.8341*CLHEP::cm*water_ABWFF, 54.0231*CLHEP::cm*water_ABWFF, 81.2306*CLHEP::cm*water_ABWFF, 120.909*CLHEP::cm*water_ABWFF, 160.238*CLHEP::cm*water_ABWFF, 
+	193.771*CLHEP::cm*water_ABWFF, 215.017*CLHEP::cm*water_ABWFF, 227.747*CLHEP::cm*water_ABWFF,  243.85*CLHEP::cm*water_ABWFF, 294.036*CLHEP::cm*water_ABWFF, 
+	321.647*CLHEP::cm*water_ABWFF,  342.81*CLHEP::cm*water_ABWFF, 362.827*CLHEP::cm*water_ABWFF, 378.041*CLHEP::cm*water_ABWFF, 449.378*CLHEP::cm*water_ABWFF,
+        739.434*CLHEP::cm*water_ABWFF, 1114.23*CLHEP::cm*water_ABWFF, 1435.56*CLHEP::cm*water_ABWFF, 1611.06*CLHEP::cm*water_ABWFF, 1764.18*CLHEP::cm*water_ABWFF, 
+	2100.95*CLHEP::cm*water_ABWFF,  2292.9*CLHEP::cm*water_ABWFF, 2431.33*CLHEP::cm*water_ABWFF,  3053.6*CLHEP::cm*water_ABWFF, 4838.23*CLHEP::cm*water_ABWFF, 
+	6539.65*CLHEP::cm*water_ABWFF, 7682.63*CLHEP::cm*water_ABWFF, 9137.28*CLHEP::cm*water_ABWFF, 12220.9*CLHEP::cm*water_ABWFF, 15270.7*CLHEP::cm*water_ABWFF, 
+	19051.5*CLHEP::cm*water_ABWFF, 23671.3*CLHEP::cm*water_ABWFF, 29191.1*CLHEP::cm*water_ABWFF, 35567.9*CLHEP::cm*water_ABWFF,   42583*CLHEP::cm*water_ABWFF,
+        49779.6*CLHEP::cm*water_ABWFF, 56465.3*CLHEP::cm*water_ABWFF,   61830*CLHEP::cm*water_ABWFF, 65174.6*CLHEP::cm*water_ABWFF, 66143.7*CLHEP::cm*water_ABWFF,   
+	  64820*CLHEP::cm*water_ABWFF,   61635*CLHEP::cm*water_ABWFF, 57176.2*CLHEP::cm*water_ABWFF, 52012.1*CLHEP::cm*water_ABWFF, 46595.7*CLHEP::cm*water_ABWFF, 
+	41242.1*CLHEP::cm*water_ABWFF, 36146.3*CLHEP::cm*water_ABWFF, 31415.4*CLHEP::cm*water_ABWFF, 27097.8*CLHEP::cm*water_ABWFF, 23205.7*CLHEP::cm*water_ABWFF, 
+	19730.3*CLHEP::cm*water_ABWFF, 16651.6*CLHEP::cm*water_ABWFF, 13943.6*CLHEP::cm*water_ABWFF, 11578.1*CLHEP::cm*water_ABWFF, 9526.13*CLHEP::cm*water_ABWFF
       };
 
    // M Fechner: Rayleigh scattering -- as of version 4.6.2 of GEANT,
@@ -280,7 +322,7 @@ void MaterialsMap::BuildMaterials(){
    //G4double RAYFF = 1.0/1.65;  //old
    //    G4double RAYFF = 1.0/1.5;  
 
-   G4double RAYFF = 0.625;
+
 
    // Get from the tuning parameters
    //RAYFF = WCSimTuningParams->GetRayff();
@@ -288,18 +330,18 @@ void MaterialsMap::BuildMaterials(){
 
    //T. Akiri: Values from Skdetsim 
    G4double RAYLEIGH_water[NUMENTRIES_water] = {
-      386929*CLHEP::cm*RAYFF,  366249*CLHEP::cm*RAYFF,  346398*CLHEP::cm*RAYFF,  327355*CLHEP::cm*RAYFF,  309097*CLHEP::cm*RAYFF,  
-      291603*CLHEP::cm*RAYFF,  274853*CLHEP::cm*RAYFF,  258825*CLHEP::cm*RAYFF,  243500*CLHEP::cm*RAYFF,  228856*CLHEP::cm*RAYFF,  
-      214873*CLHEP::cm*RAYFF,  201533*CLHEP::cm*RAYFF,  188816*CLHEP::cm*RAYFF,  176702*CLHEP::cm*RAYFF,  165173*CLHEP::cm*RAYFF,
-      154210*CLHEP::cm*RAYFF,  143795*CLHEP::cm*RAYFF,  133910*CLHEP::cm*RAYFF,  124537*CLHEP::cm*RAYFF,  115659*CLHEP::cm*RAYFF,  
-      107258*CLHEP::cm*RAYFF, 99318.2*CLHEP::cm*RAYFF, 91822.2*CLHEP::cm*RAYFF,   84754*CLHEP::cm*RAYFF, 78097.3*CLHEP::cm*RAYFF, 
-     71836.5*CLHEP::cm*RAYFF,   65956*CLHEP::cm*RAYFF, 60440.6*CLHEP::cm*RAYFF, 55275.4*CLHEP::cm*RAYFF, 50445.6*CLHEP::cm*RAYFF,
-       45937*CLHEP::cm*RAYFF, 41735.2*CLHEP::cm*RAYFF, 37826.6*CLHEP::cm*RAYFF, 34197.6*CLHEP::cm*RAYFF, 30834.9*CLHEP::cm*RAYFF, 
-     27725.4*CLHEP::cm*RAYFF, 24856.6*CLHEP::cm*RAYFF, 22215.9*CLHEP::cm*RAYFF, 19791.3*CLHEP::cm*RAYFF, 17570.9*CLHEP::cm*RAYFF,   
-       15543*CLHEP::cm*RAYFF, 13696.6*CLHEP::cm*RAYFF, 12020.5*CLHEP::cm*RAYFF, 10504.1*CLHEP::cm*RAYFF, 9137.15*CLHEP::cm*RAYFF,
-     7909.45*CLHEP::cm*RAYFF,  6811.3*CLHEP::cm*RAYFF, 5833.25*CLHEP::cm*RAYFF,  4966.2*CLHEP::cm*RAYFF, 4201.36*CLHEP::cm*RAYFF, 
-     3530.28*CLHEP::cm*RAYFF, 2944.84*CLHEP::cm*RAYFF, 2437.28*CLHEP::cm*RAYFF, 2000.18*CLHEP::cm*RAYFF,  1626.5*CLHEP::cm*RAYFF, 
-     1309.55*CLHEP::cm*RAYFF, 1043.03*CLHEP::cm*RAYFF, 821.016*CLHEP::cm*RAYFF,  637.97*CLHEP::cm*RAYFF, 488.754*CLHEP::cm*RAYFF
+      386929*CLHEP::cm*water_RAYFF,  366249*CLHEP::cm*water_RAYFF,  346398*CLHEP::cm*water_RAYFF,  327355*CLHEP::cm*water_RAYFF,  309097*CLHEP::cm*water_RAYFF,  
+      291603*CLHEP::cm*water_RAYFF,  274853*CLHEP::cm*water_RAYFF,  258825*CLHEP::cm*water_RAYFF,  243500*CLHEP::cm*water_RAYFF,  228856*CLHEP::cm*water_RAYFF,  
+      214873*CLHEP::cm*water_RAYFF,  201533*CLHEP::cm*water_RAYFF,  188816*CLHEP::cm*water_RAYFF,  176702*CLHEP::cm*water_RAYFF,  165173*CLHEP::cm*water_RAYFF,
+      154210*CLHEP::cm*water_RAYFF,  143795*CLHEP::cm*water_RAYFF,  133910*CLHEP::cm*water_RAYFF,  124537*CLHEP::cm*water_RAYFF,  115659*CLHEP::cm*water_RAYFF,  
+      107258*CLHEP::cm*water_RAYFF, 99318.2*CLHEP::cm*water_RAYFF, 91822.2*CLHEP::cm*water_RAYFF,   84754*CLHEP::cm*water_RAYFF, 78097.3*CLHEP::cm*water_RAYFF, 
+     71836.5*CLHEP::cm*water_RAYFF,   65956*CLHEP::cm*water_RAYFF, 60440.6*CLHEP::cm*water_RAYFF, 55275.4*CLHEP::cm*water_RAYFF, 50445.6*CLHEP::cm*water_RAYFF,
+       45937*CLHEP::cm*water_RAYFF, 41735.2*CLHEP::cm*water_RAYFF, 37826.6*CLHEP::cm*water_RAYFF, 34197.6*CLHEP::cm*water_RAYFF, 30834.9*CLHEP::cm*water_RAYFF, 
+     27725.4*CLHEP::cm*water_RAYFF, 24856.6*CLHEP::cm*water_RAYFF, 22215.9*CLHEP::cm*water_RAYFF, 19791.3*CLHEP::cm*water_RAYFF, 17570.9*CLHEP::cm*water_RAYFF,   
+       15543*CLHEP::cm*water_RAYFF, 13696.6*CLHEP::cm*water_RAYFF, 12020.5*CLHEP::cm*water_RAYFF, 10504.1*CLHEP::cm*water_RAYFF, 9137.15*CLHEP::cm*water_RAYFF,
+     7909.45*CLHEP::cm*water_RAYFF,  6811.3*CLHEP::cm*water_RAYFF, 5833.25*CLHEP::cm*water_RAYFF,  4966.2*CLHEP::cm*water_RAYFF, 4201.36*CLHEP::cm*water_RAYFF, 
+     3530.28*CLHEP::cm*water_RAYFF, 2944.84*CLHEP::cm*water_RAYFF, 2437.28*CLHEP::cm*water_RAYFF, 2000.18*CLHEP::cm*water_RAYFF,  1626.5*CLHEP::cm*water_RAYFF, 
+     1309.55*CLHEP::cm*water_RAYFF, 1043.03*CLHEP::cm*water_RAYFF, 821.016*CLHEP::cm*water_RAYFF,  637.97*CLHEP::cm*water_RAYFF, 488.754*CLHEP::cm*water_RAYFF
    };
 
 
@@ -419,12 +461,13 @@ void MaterialsMap::BuildMaterials(){
      0.38, 0.37, 0.35, 0.34, 0.34, 0.33 };
    // convert k to absorption length a:
    // a = lambda / ( 4*pi*k )
-   double scale_abs_length = 1.0;//1000.0/30.0;
+   //double scale_abs_length = 6.0;//1000.0/30.0;
    for ( unsigned i=0; i<NUMENTRIES_cathode; ++i ){
      ENERGY_cathode[NUMENTRIES_cathode-i-1] = 1239.8 / lambda_cathode[i] * CLHEP::eV;
      RINDEX_cathode[NUMENTRIES_cathode-i-1] = n_cathode[i];
-     ABSLENGTH_cathode[NUMENTRIES_cathode-i-1] = lambda_cathode[i] / ( 4.0*CLHEP::pi*k_cathode[i] ) * scale_abs_length * CLHEP::nm;
+     ABSLENGTH_cathode[NUMENTRIES_cathode-i-1] = lambda_cathode[i] / ( 4.0*CLHEP::pi*k_cathode[i] ) * cathode_ABWFF * CLHEP::nm;
      EFFICIENCY_cathode[i] = 1.0;
+     std::cout<<"Cathode photon E="<<ENERGY_cathode[NUMENTRIES_cathode-i-1]/CLHEP::eV<<" eV "<<" Abs-length="<<ABSLENGTH_cathode[NUMENTRIES_cathode-i-1]/CLHEP::nm<<" nm"<<std::endl;
    }   
    G4MaterialPropertiesTable *myMPTcath = new G4MaterialPropertiesTable();
    myMPTcath->AddProperty("RINDEX",   ENERGY_cathode, RINDEX_cathode,     NUMENTRIES_cathode);
@@ -482,18 +525,18 @@ void MaterialsMap::BuildMaterials(){
        1.5853, 1.5941, 1.6047, 1.6173, 1.6328 }; 
    
    G4double ABSORPTION_glass[NUMENTRIES_water]= 
-     { 1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,
-       1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm,1.0e3*CLHEP::cm, 1.0e3*CLHEP::cm };
+     { 1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,
+       1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF,1.0e3*CLHEP::cm*glass_ABWFF, 1.0e3*CLHEP::cm*glass_ABWFF };
 
    G4MaterialPropertiesTable *myMPT5 = new G4MaterialPropertiesTable();
    myMPT5->AddProperty("RINDEX",   ENERGY_water, RINDEX_glass,     NUMENTRIES_water);
