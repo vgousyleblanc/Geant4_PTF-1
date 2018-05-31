@@ -8,6 +8,8 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Material.hh"
+#include "CathodeSD.hh"
+#include "G4SDManager.hh"
 
 /// R3600Geometry
 /// Class to construct Geant4 goemtry of a Hammamatsu R3600 PMT
@@ -21,8 +23,10 @@ public:
 		 G4LogicalVolume * parentvol,    //< Parent volume in which to place this PMT
 		 const G4ThreeVector & loc,     //< loc : location of the center of the front glass of the PMT	  
 		 const G4ThreeVector & dir, 	//< dir : normal to the center of the front glass of the PMT		  
-		 bool add_water = true, 	//< water: set true to place PMT in water, rather than air		  
-		 bool add_acrylic = true );	//< acrylic : set true to add the acrylic and FRP cover to the geometry 
+		 bool add_acrylic = true,       //< acrylic : set true to add the acrylic and FRP cover to the geometry 
+		 double acryl_thick = 13.0 * CLHEP::mm,
+		 double glass_thick =  4.0 * CLHEP::mm,
+		 double cath_thick  = 30.0 * CLHEP::nm );	
   ~R3600Geometry();
 
   /// Get the PMT geometry with name volname
@@ -32,14 +36,37 @@ public:
   int                  GetPMTId()    const { return fPMTId; }
   const G4ThreeVector& get_loc()     const { return fLoc ; }
   const G4ThreeVector& get_dir()     const { return fDir ; }
-  bool                 InWater()     const { return fInWater ; }
   bool                 WithAcrylic() const { return fWithAcrylic; }
 
-  // Method to get overall region, plus the rotation and translation
-  // To subtract from other volumes.
-  void get_solid( G4VSolid & vol, G4RotationMatrix& rm, G4ThreeVector& loc ); 
+  /// Method to get overall region, plus the rotation and translation
+  /// To subtract from other volumes.
+  //void get_solid( G4VSolid & vol, G4RotationMatrix& rm, G4ThreeVector& loc ); 
 
 
+  /// Attach sensitive detector
+  void attachSD();
+    
+  /// Method to disable sensitive detector of this PMT
+  //void disableSD( bool disable=true ){
+  //  G4String sdname = fSD->get_name(); 
+  //  G4SDManager::GetSDMpointer()->Activate( sdname, !disable );
+    // delete fSD;
+  //}
+
+  /// Method to remove physical volumes from parent
+  ///
+  //void Disable(){
+  //  fParent->RemoveDaughter( fVols[ "pmtglass" ] );
+  //  delete fVols[ "pmtglass"];
+  //  if ( fWithAcrylic ) {
+  //    fParent->RemoveDaughter( fVols[ "acrylic_dome"] );
+  //    fParent->RemoveDaughter( fVols[ "frp_cover"] );
+  //    delete fVols["acrylic_dome"];
+  //    delete fVols["frp_cover"];
+  //  }
+    //if ( fSD != nullptr ) disableSD();
+  // }
+  
 private:
   void Init();
   void BuildAcrylic();
@@ -50,8 +77,11 @@ private:
   int fPMTId;
   G4ThreeVector fLoc;
   G4ThreeVector fDir;
-  bool fInWater;
   bool fWithAcrylic;
+
+  double acrylic_thickness; //< default 13 mm
+  double glass_thickness;   //< default  4 mm
+  double cathode_thickness; //< default 30 nm
   
   /// Built by initialization
   G4RotationMatrix *fRm;
@@ -67,7 +97,10 @@ private:
   std::map< std::string, G4VPhysicalVolume * > fVols;
 
   /// overall volume to use in subtraction from wherever this PMT is placed
-  G4VSolid * fSumSolid;
+  //G4VSolid * fSumSolid;
+
+  /// Sensitive detector
+  CathodeSD * fSD;
 };
 
 

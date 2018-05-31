@@ -50,6 +50,7 @@ class OpNoviceSteppingAction : public G4UserSteppingAction
     G4int fScintillationCounter;
     G4int fCerenkovCounter;
     G4int fEventNumber;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

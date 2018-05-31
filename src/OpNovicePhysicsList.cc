@@ -54,11 +54,12 @@
 #include "G4OpRayleigh.hh"
 #include "G4OpMieHG.hh"
 #include "G4OpBoundaryProcess.hh"
+#include "G4StepLimiter.hh"
 
 #include "G4LossTableManager.hh"
 #include "G4EmSaturation.hh"
 
-G4ThreadLocal G4int OpNovicePhysicsList::fVerboseLevel = 1;
+G4ThreadLocal G4int OpNovicePhysicsList::fVerboseLevel = 0;
 G4ThreadLocal G4int OpNovicePhysicsList::fMaxNumPhotonStep = 20;
 G4ThreadLocal G4Cerenkov* OpNovicePhysicsList::fCerenkovProcess = 0;
 G4ThreadLocal G4Scintillation* OpNovicePhysicsList::fScintillationProcess = 0;
@@ -66,7 +67,9 @@ G4ThreadLocal G4OpAbsorption* OpNovicePhysicsList::fAbsorptionProcess = 0;
 G4ThreadLocal G4OpRayleigh* OpNovicePhysicsList::fRayleighScatteringProcess = 0;
 G4ThreadLocal G4OpMieHG* OpNovicePhysicsList::fMieHGScatteringProcess = 0;
 G4ThreadLocal G4OpBoundaryProcess* OpNovicePhysicsList::fBoundaryProcess = 0;
- 
+G4ThreadLocal G4StepLimiter* OpNovicePhysicsList::fStepLimiter = 0;
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 OpNovicePhysicsList::OpNovicePhysicsList() 
@@ -228,7 +231,8 @@ void OpNovicePhysicsList::ConstructOp()
   fRayleighScatteringProcess = new G4OpRayleigh();
   fMieHGScatteringProcess = new G4OpMieHG();
   fBoundaryProcess = new G4OpBoundaryProcess();
-
+  fStepLimiter = new G4StepLimiter();
+  
   fCerenkovProcess->SetVerboseLevel(fVerboseLevel);
   fScintillationProcess->SetVerboseLevel(fVerboseLevel);
   fAbsorptionProcess->SetVerboseLevel(fVerboseLevel);
@@ -265,6 +269,8 @@ void OpNovicePhysicsList::ConstructOp()
       pmanager->AddDiscreteProcess(fRayleighScatteringProcess);
       pmanager->AddDiscreteProcess(fMieHGScatteringProcess);
       pmanager->AddDiscreteProcess(fBoundaryProcess);
+      // Add step limiter for cathode and possibly other thin layers
+      pmanager->AddDiscreteProcess(fStepLimiter);
     }
   }
 }

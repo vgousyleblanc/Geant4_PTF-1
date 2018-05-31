@@ -28,9 +28,16 @@ protected:
   MaterialsMap();
 
 private:
-  void   BuildMaterials(); 
+  void   BuildMaterials();
+  void   ReadMaterials(); // input parameters
   static MaterialsMap * fMaterialsMap;
   static std::map< std::string, G4Material * > fMaterials;
+
+  G4double water_ABWFF;   // water absorption length scaling factor
+  G4double water_RAYFF;   // water Raleigh scattering scaling factor
+  G4double cathode_ABWFF; // cathode absorption length scaling factor
+  G4double glass_ABWFF;   // glass absorption length scaling factor
+
 };
 
 /// function to print info about materials available
