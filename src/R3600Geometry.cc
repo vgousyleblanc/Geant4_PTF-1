@@ -16,19 +16,24 @@
 #include "G4SDManager.hh"
 
 
-R3600Geometry::R3600Geometry( G4LogicalVolume * parentvol, const G4ThreeVector & loc,
-			      const G4ThreeVector & dir, bool add_acrylic, double acryl_thick,
-			      double glass_thick, double cath_thick ) :
+R3600Geometry::R3600Geometry( G4LogicalVolume * parentvol,
+				const G4ThreeVector & loc,
+				const G4ThreeVector & dir,
+				bool add_acrylic,
+				double acryl_thick,
+				double glass_thick,
+				double cath_thick ) :
   fParent(parentvol), fPMTId(0), fLoc(loc), fDir(dir.unit()),  fWithAcrylic(add_acrylic),
   acrylic_thickness( acryl_thick ), glass_thickness( glass_thick ),
-  cathode_thickness( cath_thick ), fSumSolid(nullptr) {
+  cathode_thickness( cath_thick ), fSD(nullptr)
+{
   static int pmtcount=0;
   ++pmtcount; fPMTId = pmtcount;
   Init();
 }
 
 R3600Geometry::~R3600Geometry(){
-  if ( fSumSolid != nullptr ) delete fSumSolid;
+
   if ( fRm != nullptr ) delete fRm;
   for ( auto & curpair : fVols ){
     G4VPhysicalVolume * curphysvol = curpair.second;
@@ -37,6 +42,7 @@ R3600Geometry::~R3600Geometry(){
   if ( fSD != nullptr ) delete fSD;
 }
 
+  /*
 void R3600Geometry::get_solid( G4VSolid & vol, G4RotationMatrix& rm, G4ThreeVector& loc ) {
   std::ostringstream os;
   int volcount=0;
@@ -67,6 +73,27 @@ void R3600Geometry::get_solid( G4VSolid & vol, G4RotationMatrix& rm, G4ThreeVect
   loc = fLoc;
   return;
 }
+  */
+
+  
+void R3600Geometry::attachSD(){
+  // Add sensitive detector to Cathode
+  G4VPhysicalVolume * cath_phys = fVols[ "cathode" ];
+  G4LogicalVolume * cath_log = cath_phys->GetLogicalVolume();
+  //if ( fSD != nullptr ){
+  //  std::cout<<"Sensitive detector already exists, attach to "<<cath_phys->GetName()<<std::endl;
+  //  cath_log->SetSensitiveDetector( fSD );
+  //
+  //} else {
+  std::cout<<"Building sensitive detector with name "<<cath_phys->GetName()<<std::endl;
+  fSD = new CathodeSD( cath_phys->GetName() );
+  cath_log->SetSensitiveDetector( fSD );
+
+  //}
+  G4SDManager::GetSDMpointer()->ListTree();
+}
+				   
+				   
 
 void R3600Geometry::Init( ){
   std::ostringstream os;
@@ -143,7 +170,7 @@ void R3600Geometry::Init( ){
   G4ThreeVector offset = fLoc + G4ThreeVector( 0., 0., -210.0*CLHEP::mm );
 
   fVols[ "pmtglass" ] = new G4PVPlacement( fRm, offset, eglass_log, os.str().c_str(), fParent, false, 0 );
-  //fSurfaces.skin_surface( "pmtglass", fVols[ "pmtglass" ] );
+  fSurfaces.skin_surface( "pmtglass", fVols[ "pmtglass" ] );
   
   // PMT Vaccum Logical Volume.
   // It centers on PMT Glass, so placed "pmtvaccum" gets put inside PMT
@@ -323,7 +350,7 @@ void R3600Geometry::BuildAcrylic() {
   G4ThreeVector offset = fLoc + G4ThreeVector( 0., 0., -300.0*CLHEP::mm );
 
   fVols[ "acrylic_dome" ] = new G4PVPlacement( fRm, offset, eacryl_log, os.str().c_str(), fParent, false, 0 );
-  //fSurfaces.skin_surface( "acrylic", fVols[ "acrylic_dome" ] );
+  fSurfaces.skin_surface( "acrylic", fVols[ "acrylic_dome" ] );
 
 
 

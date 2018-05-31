@@ -28,7 +28,7 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "OpNoviceDetectorMessenger.hh"
+//#include "OpNoviceDetectorMessenger.hh"
 #include "OpNoviceDetectorConstruction.hh"
 
 
@@ -64,7 +64,7 @@ OpNoviceDetectorConstruction::OpNoviceDetectorConstruction()
 {
   // set defaults
   fExpHall_x = fExpHall_y = fExpHall_z = 10.0*m;
-  fDetMessenger = new OpNoviceDetectorMessenger( this );
+  //fDetMessenger = new OpNoviceDetectorMessenger( this );
   tank_has_water = true;
   water_height = 116.0*CLHEP::cm;
   fDUT = "R3600";
@@ -75,6 +75,8 @@ OpNoviceDetectorConstruction::OpNoviceDetectorConstruction()
   fPMT=nullptr;
   expHall_log=nullptr;
   expHall_phys=nullptr;
+
+  ReadGeometry();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -84,10 +86,14 @@ OpNoviceDetectorConstruction::~OpNoviceDetectorConstruction(){
 }
 
 
-void OpNoviceDetectorConstruction::ConstructSDAndField(){
+void OpNoviceDetectorConstruction::ConstructSDandField(){
+  //
+  //std::cout<<"fPMT->fSD = "<<fPMT->fSD<<std::endl;
   fPMT->attachSD();
+  G4SDManager::GetSDMpointer()->ListTree();
 }
 
+/*
 void OpNoviceDetectorConstruction::UpdateGeometry() {
 
 // clean-up previous geometry
@@ -115,12 +121,13 @@ void OpNoviceDetectorConstruction::UpdateGeometry() {
   //define new one
   G4RunManager::GetRunManager()->DefineWorldVolume(Construct());//ConstructDetector()
   G4RunManager::GetRunManager()->GeometryHasBeenModified();
-
-  //fPMT->attachSD( );
+  //G4RunManager::GetRunManager()->ReinitializeGeometry();
+  
   G4SDManager::GetSDMpointer()->ListTree();
 
   std::cout<<"The Geometry has been modified"<<std::endl;
 }
+*/
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -227,6 +234,86 @@ G4VPhysicalVolume* OpNoviceDetectorConstruction::Construct()
   }
 //always return the physical World
   return expHall_phys;
+}
+
+void apply_unit( double & val, const std::string& unit ){
+  if ( unit == "nm" ){
+    val *= CLHEP::nm;
+  } else if ( unit == "um" ){
+    val *= CLHEP::um;
+  } else if ( unit == "mm" ){
+    val *= CLHEP::mm;
+  } else if ( unit == "cm" ){
+    val *= CLHEP::cm;
+  } else if ( unit == "m" ){
+    val *= CLHEP::m;
+  } else {
+    std::cout<<"apply_unit "<<unit<<", unknown unit, not applying."<<std::endl;
+  }
+}
+
+void OpNoviceDetectorConstruction::ReadGeometry(){
+
+  std::cout<<"OpNoviceDetectorConstruction::ReadGeometry() starting "<<std::endl;
+  
+  std::ifstream infile( "ptf-geom.txt" );
+
+  if ( !infile ) {
+    std::cout<<"Could not open ptf-geom.txt, using default geometry"<<std::endl;
+    return;
+  }
+
+  std::string line;
+  while ( std::getline( infile, line ) ){
+    std::cout<<"Processing line: "<<line<<std::endl;
+    std::istringstream is( line );
+    std::string tag;
+
+    is >> tag;
+    if ( tag == "#" ){
+      continue;
+    } else if ( tag == "haswater" ) {
+      std::string mybool;
+      is >> mybool;
+      if ( mybool == "true" ) tank_has_water = true;
+      else if ( mybool == "false" ) tank_has_water = false;
+      else if ( mybool == "0" ) tank_has_water = false;
+      else tank_has_water = true;
+      std::cout<<"OpNoviceDetectorConstruction::ReadGeometry tank_has_water = "<<tank_has_water<<std::endl;
+      
+    } else if ( tag == "r3600hasacrylic" ){
+      std::string mybool;
+      is >> mybool;
+      if ( mybool == "true" ) r3600_hasacryl = true;
+      else if ( mybool == "false" ) r3600_hasacryl = false;
+      else if ( mybool == "0" ) r3600_hasacryl = false;
+      else r3600_hasacryl = true;
+      std::cout<<"OpNoviceDetectorConstruction::ReadGeometry r3600_hasacryl = "<<r3600_hasacryl<<std::endl;
+
+    } else if ( tag == "r3600glassthickness" ){
+      std::string unit;
+      is >> r3600_glassthick >> unit;
+      apply_unit( r3600_glassthick, unit );
+      std::cout<<"OpNoviceDetectorConstruction::ReadGeometry r3600_glassthick = "<<r3600_glassthick/CLHEP::mm<<" mm"<<std::endl;
+
+    } else if ( tag == "r3600cathodethickness" ){
+      std::string unit;
+      is >> r3600_caththick >> unit;
+      apply_unit( r3600_caththick, unit );
+      std::cout<<"OpNoviceDetectorConstruction::ReadGeometry r3600_caththick = "<<r3600_caththick/CLHEP::nm<<" nm"<<std::endl;
+
+
+    } else if ( tag == "r3600acrylicthickness" ){
+      std::string unit;
+      is >> r3600_acrylthick >> unit;
+      apply_unit( r3600_acrylthick, unit );
+      std::cout<<"OpNoviceDetectorConstruction::ReadGeometry r3600_acrylthick = "<<r3600_acrylthick/CLHEP::mm<<" mm"<<std::endl;
+
+
+    }
+  }
+  std::cout<<"OpNoviceDetectorConstruction::ReadGeometry() ending "<<std::endl;
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

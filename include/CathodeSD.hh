@@ -10,7 +10,7 @@
 #include "G4VSensitiveDetector.hh"
 #include "G4HCofThisEvent.hh"
 #include "globals.hh"
-
+#include "PhotonCathodeHit.hh"
 
 class CathodeSD : public G4VSensitiveDetector {
 public:
@@ -19,12 +19,14 @@ public:
   ~CathodeSD(){;}
   
   G4bool ProcessHits( G4Step * , G4TouchableHistory *  );
-  //void   Initialize( G4HCofThisEvent * );
-  //void   EndOfEvent( G4HCofThisEvent * );
+  void   Initialize( G4HCofThisEvent * );
+  void   EndOfEvent( G4HCofThisEvent * );
 
   G4String get_name() const { return fName ; }
 private:
+  int      collectionID;
   G4String fName;
+  PhotonCathodeHC * fHits;
 };
 
 /// report a helper for printing G4Step info

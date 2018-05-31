@@ -39,25 +39,49 @@ void PrintG4Step( G4Step* step ){
 }
 
 
-CathodeSD::CathodeSD( G4String aname ) : G4VSensitiveDetector( aname ), fName( aname ){
-    
-    G4SDManager * sdman = G4SDManager::GetSDMpointer();
-    sdman->AddNewDetector( this );
+CathodeSD::CathodeSD( G4String aname )
+  : G4VSensitiveDetector( aname ), collectionID(-1),fName( aname )
+{
+  collectionName.insert( "cathode_hits" );
+  G4SDManager * sdman = G4SDManager::GetSDMpointer();
+  sdman->AddNewDetector( this );
 }
 
 G4bool CathodeSD::ProcessHits( G4Step * step, G4TouchableHistory *  ){
+  //std::cout<<"CathodeSD::Processhits for "<<fName<<std::endl;
+  const G4Track              * track    = step->GetTrack();
+  const G4ParticleDefinition * particle = track->GetParticleDefinition();
+  G4String ParticleName =  particle->GetParticleName();
 
-  std::cout<<"CathodeSD::Processhits for "<<fName<<std::endl;
-  PrintG4Step(  step );
+  // PrintG4Step(  step );
+
+  double ene =step->GetTotalEnergyDeposit()/CLHEP::eV;
+  if ( ene > 1.0  && ParticleName == "opticalphoton" ){
+    const G4StepPoint          * post     = step->GetPostStepPoint();
+    const G4ThreeVector        & postpos  = post->GetPosition();
+    const G4VPhysicalVolume    * postvol  = post->GetPhysicalVolume();
+    double time = post->GetGlobalTime() / CLHEP::ns;
+    const G4ThreeVector        & postdir  = post->GetMomentumDirection();
+    unsigned pmtnum = postvol->GetCopyNo();
+
+    
+    fHits->insert( new PhotonCathodeHit( postpos, postdir, time, ene, pmtnum ) );
+  }
+  
+  
   return true;
 }
 
-/*
-void CathodeSD::Initialize( G4HCofThisEvent *  ){
 
+void CathodeSD::Initialize( G4HCofThisEvent * hce ){
+  if (collectionID<0) collectionID = GetCollectionID(0);
+  fHits = new PhotonCathodeHC( fName, collectionName[0] );
+  hce->AddHitsCollection( collectionID, fHits );
 }
 
 void CathodeSD::EndOfEvent( G4HCofThisEvent *  ){
 
+  std::cout<<"CathodeSD::EndOfEvent detected "<<fHits->GetSize()<<" photons"<<std::endl;
+  G4SDManager::GetSDMpointer()->ListTree();
 }
-*/
+

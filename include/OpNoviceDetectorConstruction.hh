@@ -35,7 +35,7 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "R3600Geometry.hh"
 
-class OpNoviceDetectorMessenger;
+//class OpNoviceDetectorMessenger;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -45,10 +45,8 @@ public:
   virtual ~OpNoviceDetectorConstruction();
 
   virtual G4VPhysicalVolume* Construct();
-  virtual void ConstructSDAndField();
-  
-  void UpdateGeometry();
-  
+  void ConstructSDandField();
+    
   void set_haswater( bool haswater ){
     std::cout<<"OpNoviceDetectorConstruction::set_haswater="<<haswater<<std::endl;
     tank_has_water = haswater; }
@@ -70,7 +68,9 @@ public:
     r3600_acrylthick = acrylthick; }
   
 private:
-  OpNoviceDetectorMessenger* fDetMessenger;
+  void ReadGeometry();
+
+  //OpNoviceDetectorMessenger* fDetMessenger;
   
   G4double fExpHall_x;
   G4double fExpHall_y;
@@ -85,8 +85,6 @@ private:
   double   r3600_glassthick;  // default 4mm
   double   r3600_caththick;   // default 30nm
   double   r3600_acrylthick;  // default 13 mm
-
-  
   
   R3600Geometry * fPMT;
 
