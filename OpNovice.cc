@@ -50,8 +50,9 @@
 
 #include "OpNovicePhysicsList.hh"
 #include "OpNoviceDetectorConstruction.hh"
-
 #include "OpNoviceActionInitialization.hh"
+#include "PTFDigitizeEvent.hh"
+
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"
@@ -114,31 +115,37 @@ int main(int argc,char** argv)
 
   // Construct the default run manager
   //
-#ifdef G4MULTITHREADED
-  G4MTRunManager * runManager = new G4MTRunManager;
-  if ( nThreads > 0 ) runManager->SetNumberOfThreads(nThreads);
-#else
+  //#ifdef G4MULTITHREADED
+  //  G4MTRunManager * runManager = new G4MTRunManager;
+  //  if ( nThreads > 0 ) runManager->SetNumberOfThreads(nThreads);
+  //#else
   G4RunManager * runManager = new G4RunManager;
-#endif
+  //#endif
     std::cout<<"Here 3"<<std::endl;
 
 
   // Seed the random number generator manually
   G4Random::setTheSeed(myseed);
 
+    std::cout<<"Here 3b"<<std::endl;
   // Physics list has to be before ruser action!
   runManager-> SetUserInitialization(new OpNovicePhysicsList());
-
+    std::cout<<"Here 3c"<<std::endl;
   
   // read the macro file first!
   // User action initialization
   runManager->SetUserInitialization(new OpNoviceActionInitialization());
+    std::cout<<"Here 3d"<<std::endl;
 
   // Set mandatory initialization classes
   //
-  // Detector construction
+
+   // Detector construction
   OpNoviceDetectorConstruction * fdet = new OpNoviceDetectorConstruction(); 
   runManager-> SetUserInitialization( fdet );
+    std::cout<<"Here 3d"<<std::endl;
+  // Event action
+  runManager->SetUserAction( new PTFDigitizeEvent() );
     std::cout<<"Here 4"<<std::endl;
 
   std::cout<<"Here 5"<<std::endl;
@@ -164,7 +171,8 @@ int main(int argc,char** argv)
   // Get the pointer to the User Interface manager
   //
   G4UImanager* UImanager = G4UImanager::GetUIpointer(); 
-   
+  UImanager->ApplyCommand( "/process/activate Cerenkov" );   
+
   if ( macro.size() ) {
      // Batch mode
      G4String command = "/control/execute ";

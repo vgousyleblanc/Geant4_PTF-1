@@ -80,11 +80,46 @@ OpNovicePrimaryGeneratorAction::~OpNovicePrimaryGeneratorAction()
 
 void OpNovicePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+  static int scan_location = 0;
+
+  const double scan_xmin = -250.0 * CLHEP::mm;
+  const double scan_xmax =  250.0 * CLHEP::mm;
+  const double scan_ymin = -250.0 * CLHEP::mm;
+  const double scan_ymax =  250.0 * CLHEP::mm;
+  const int scan_nx = 250;
+  const int scan_ny = 250;
+  const int scan_N = scan_nx * scan_ny;
+
+  const double scan_dx = (scan_xmax - scan_xmin) / scan_nx;
+  const double scan_dy = (scan_ymax - scan_ymin) / scan_ny;
+
   if ( fSourceType == "gun" ){
-    std::cout<<"OpNovicePrimaryGeneratorAction: using gun source"<<std::endl;
+    //std::cout<<"OpNovicePrimaryGeneratorAction: using gun source ... doing normal incidence scan"<<std::endl;
+    fParticleGun->SetNumberOfParticles( 10000 );
+    fParticleGun->SetParticleDefinition( G4ParticleTable::GetParticleTable()->FindParticle("opticalphoton") );
+    int nparticles = fParticleGun->GetNumberOfParticles();
+    //std::cout<<"particles="<<fParticleGun->GetParticleDefinition()->GetParticleName()<<std::endl;
+    G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
+    //std::cout<<"direction="<<dir.x()<<" , "<<dir.y()<<", "<<dir.z()<<std::endl;
+
+    int ix = scan_location / scan_nx;
+    int iy = scan_location % scan_nx;
+
+    double xloc = scan_xmin + ix * scan_dx;
+    double yloc = scan_ymin + iy * scan_dy;
+    
+    fParticleGun->SetParticlePosition( G4ThreeVector( xloc, yloc, 2.0*CLHEP::cm ) );
     fParticleGun->GeneratePrimaryVertex(anEvent);
+    scan_location = (++scan_location) % scan_N;
+    //if ( scan_location % 100 == 0 ){
+      std::cout<<"scan_location="<<scan_location<<" of "<<scan_N<<std::endl;
+      std::cout<<"Generating "<<nparticles<<" at "<<xloc/CLHEP::cm<<", "<<yloc/CLHEP::cm<<", 2.0 cm"<<std::endl;
+      //}
+
   } else if ( fSourceType == "gps" ) {
     std::cout<<"OpNovicePrimaryGeneratorAction: using gps source"<<std::endl;
+    int numpart = fParticleGPS->GetNumberOfParticles();
+    std::cout<<"Generate "<<numpart<<" particles"<<std::endl;
     fParticleGPS->GeneratePrimaryVertex(anEvent);
   }
 }

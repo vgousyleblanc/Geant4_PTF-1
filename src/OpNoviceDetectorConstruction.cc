@@ -63,7 +63,7 @@ OpNoviceDetectorConstruction::OpNoviceDetectorConstruction()
  : G4VUserDetectorConstruction()
 {
   // set defaults
-  fExpHall_x = fExpHall_y = fExpHall_z = 10.0*m;
+  fExpHall_x = fExpHall_y = fExpHall_z = 20.0*m;
   //fDetMessenger = new OpNoviceDetectorMessenger( this );
   tank_has_water = true;
   water_height = 116.0*CLHEP::cm;
@@ -89,7 +89,7 @@ OpNoviceDetectorConstruction::~OpNoviceDetectorConstruction(){
 void OpNoviceDetectorConstruction::ConstructSDandField(){
   //
   //std::cout<<"fPMT->fSD = "<<fPMT->fSD<<std::endl;
-  fPMT->attachSD();
+  fPMT->attachSD(0); //PMT 0!
   G4SDManager::GetSDMpointer()->ListTree();
 }
 
@@ -143,6 +143,21 @@ G4VPhysicalVolume* OpNoviceDetectorConstruction::Construct()
   //
   G4Material* air = fMaterials[ "air"];
 
+
+
+  // The experimental Hall
+  // only build it once.
+  if ( expHall_log == nullptr ){
+    G4Box* expHall_box = new G4Box("World",fExpHall_x,fExpHall_y,fExpHall_z);
+    
+    expHall_log = new G4LogicalVolume(expHall_box,air,"World",0,0,0);
+    
+    expHall_phys = new G4PVPlacement(0,G4ThreeVector(),expHall_log,"World",0,false,0);
+    
+  }
+  //if ( reallyconstruct == false ) return expHall_phys;
+  
+  
   // Water
   //
   G4Material* water = fMaterials[ "water" ];
@@ -150,9 +165,9 @@ G4VPhysicalVolume* OpNoviceDetectorConstruction::Construct()
   // Black water (or air) tank
   G4Material* black_plastic = fMaterials[ "blacksheet" ];
   
-//
-// ------------- Volumes --------------
-
+  //
+  // ------------- Volumes --------------
+  
   const double tank_height =  2.0 * 63.818 * CLHEP::cm;
 
   const double pmt_offset_to_rim = 35.0 * CLHEP::cm; // distance from top of tank of top of PMT (made up number!)
@@ -165,42 +180,30 @@ G4VPhysicalVolume* OpNoviceDetectorConstruction::Construct()
 
   std::cout<<"pmt_offsetz="<<pmt_offsetz<<std::endl;
 
-  
-// The experimental Hall
-// only build it once.
-  if ( expHall_log == nullptr ){
-    G4Box* expHall_box = new G4Box("World",fExpHall_x,fExpHall_y,fExpHall_z);
-
-    expHall_log = new G4LogicalVolume(expHall_box,air,"World",0,0,0);
-
-    expHall_phys = new G4PVPlacement(0,G4ThreeVector(),expHall_log,"World",0,false,0);
-
-  }
-  //if ( reallyconstruct == false ) return expHall_phys;
-  
   // The Water Tank
   //
-  G4Tubs* waterTank_solid = new G4Tubs("Tank", 0.0, 60.96 * CLHEP::cm, 64.456 * CLHEP::cm , 0., 2.0 * CLHEP::pi );
-  // And add a rim
+  G4Tubs* waterTank_solid = new G4Tubs("Tank", 59.0, 60.96 * CLHEP::cm, 64.456 * CLHEP::cm , 0., 2.0 * CLHEP::pi );
+  // And add a rim and bottom
   G4Tubs* waterTank_rim = new G4Tubs("TankRim",60.96 * CLHEP::cm, 66.827 * CLHEP::cm, 1.945 * CLHEP::cm, 0., 2.0 * CLHEP::pi );
+  G4Tubs* waterTank_bottom = new G4Tubs("TankBot",0.0 * CLHEP::cm, 60.96 * CLHEP::cm, 1.0 * CLHEP::cm, 0., 2.0 * CLHEP::pi );
   G4UnionSolid * waterTank_tub = new G4UnionSolid( "waterTank_tub", waterTank_solid, waterTank_rim, 0, G4ThreeVector( 0., 0., (64.456-1.945)*CLHEP::cm ) );
-  G4LogicalVolume* waterTank_log = new G4LogicalVolume(waterTank_tub,black_plastic,"Tank",0,0,0);
+  G4UnionSolid * waterTank_tot = new G4UnionSolid( "waterTank_tot", waterTank_tub, waterTank_bottom, 0, G4ThreeVector( 0., 0., (-64.456+1.0)*CLHEP::cm ) );
+  G4LogicalVolume* waterTank_log = new G4LogicalVolume(waterTank_tot,black_plastic,"Tank",0,0,0);
   waterTank_phys = new G4PVPlacement(0,G4ThreeVector(0.,0.,tank_world_offset),waterTank_log,"Tank", expHall_log,false,0);
   fSurfaces.skin_surface( "blacksheet", waterTank_phys );
   waterTank_log->SetVisAttributes( G4VisAttributes( G4Color::Brown() ) );
   
-  
   // Fill Water tank with Air first
-  G4Tubs * Tankair_tub = new G4Tubs("TankAir",0.0, 60.325 * CLHEP::cm, 63.818 * CLHEP::cm , 0., 2.0 * CLHEP::pi );
-  G4LogicalVolume * Tankair_log = new G4LogicalVolume( Tankair_tub, air, "TankAir_log" );
-  G4VPhysicalVolume* Tankair_phys = new G4PVPlacement( 0, G4ThreeVector(0.,0.,0.635*CLHEP::cm), Tankair_log, "Tankair_phys", waterTank_log, false, 0 );
+  //G4Tubs * Tankair_tub = new G4Tubs("TankAir",0.0, 60.325 * CLHEP::cm, 63.818 * CLHEP::cm , 0., 2.0 * CLHEP::pi );
+  //G4LogicalVolume * Tankair_log = new G4LogicalVolume( Tankair_tub, air, "TankAir_log" );
+  //G4VPhysicalVolume* Tankair_phys = new G4PVPlacement( 0, G4ThreeVector(0.,0.,0.635*CLHEP::cm), Tankair_log, "Tankair_phys", waterTank_log, false, 0 );
   // give the air a surface property
   
   
   // Add Water to the tank.
   G4Tubs * Tankwater_tub = new G4Tubs("TankWater",0.0, 60.325 * CLHEP::cm, water_height / 2.0, 0., 2.0 * CLHEP::pi );
   G4LogicalVolume * Tankwater_log = new G4LogicalVolume( Tankwater_tub, tank_has_water ? water : air, "Tankwater_log" );
-  G4VPhysicalVolume* Tankwater_phys = new G4PVPlacement( 0, G4ThreeVector( 0., 0., -water_offsetz), Tankwater_log, "Tankwater_phys", Tankair_log, false, 0 );
+  G4VPhysicalVolume* Tankwater_phys = new G4PVPlacement( 0, G4ThreeVector( 0., 0., -water_offsetz), Tankwater_log, "Tankwater_phys", waterTank_log, false, 0 );
   if ( tank_has_water ){
     fSurfaces.skin_surface( "water", Tankwater_phys );
     Tankwater_log->SetVisAttributes( G4VisAttributes( G4Color::Cyan() ) );

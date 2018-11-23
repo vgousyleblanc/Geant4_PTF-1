@@ -44,7 +44,7 @@ public:
 
 
   /// Attach sensitive detector
-  void attachSD();
+  void attachSD( int pmtID );
     
   /// Method to disable sensitive detector of this PMT
   //void disableSD( bool disable=true ){

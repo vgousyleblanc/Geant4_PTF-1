@@ -39,8 +39,8 @@ void PrintG4Step( G4Step* step ){
 }
 
 
-CathodeSD::CathodeSD( G4String aname )
-  : G4VSensitiveDetector( aname ), collectionID(-1),fName( aname )
+CathodeSD::CathodeSD( unsigned pmtid, G4String aname )
+  : G4VSensitiveDetector( aname ), collectionID(-1), pmtID(pmtid), fName( aname )
 {
   collectionName.insert( "cathode_hits" );
   G4SDManager * sdman = G4SDManager::GetSDMpointer();

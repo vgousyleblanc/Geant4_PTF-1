@@ -1,7 +1,7 @@
 # Example use of gps to send beam of optical photons
 
 /OpNovice/gun/optSource gps
-/gps/verbose 2
+/gps/verbose 0
 /gps/particle opticalphoton
 /gps/polarization 0 0 1
 /gps/number 10000
@@ -19,3 +19,5 @@
 /gps/ang/rot1 0.0 1.0 0.0
 /gps/ang/rot2 1.0 0.0 0.0
 /run/beamOn 1
+
+
