@@ -126,17 +126,22 @@ int main(int argc,char** argv)
   // Seed the random number generator manually
   G4Random::setTheSeed(myseed);
 
+  // Physics list has to be before ruser action!
+  runManager-> SetUserInitialization(new OpNovicePhysicsList());
+
+  
+  // read the macro file first!
+  // User action initialization
+  runManager->SetUserInitialization(new OpNoviceActionInitialization());
+
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager-> SetUserInitialization(new OpNoviceDetectorConstruction());
+  OpNoviceDetectorConstruction * fdet = new OpNoviceDetectorConstruction(); 
+  runManager-> SetUserInitialization( fdet );
     std::cout<<"Here 4"<<std::endl;
 
-  // Physics list
-  runManager-> SetUserInitialization(new OpNovicePhysicsList());
   std::cout<<"Here 5"<<std::endl;
-  // User action initialization
-  runManager->SetUserInitialization(new OpNoviceActionInitialization());
 
     std::cout<<"Here 6"<<std::endl;
 
@@ -176,6 +181,8 @@ int main(int argc,char** argv)
 #endif
      if (ui->IsGUI())
         UImanager->ApplyCommand("/control/execute gui.mac");
+
+     //fdet->ConstructSD();
      ui->SessionStart();
      delete ui;
 #endif
