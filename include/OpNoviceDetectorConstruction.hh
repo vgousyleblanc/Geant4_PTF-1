@@ -66,6 +66,8 @@ public:
   void set_acrylicthickness( double acrylthick ){
     std::cout<<"OpNoviceDetectorConstruction::set_acrylthick="<<acrylthick/CLHEP::mm<<" mm"<<std::endl;
     r3600_acrylthick = acrylthick; }
+
+  const R3600Geometry * GetPMT() const { return fPMT; }
   
 private:
   void ReadGeometry();
