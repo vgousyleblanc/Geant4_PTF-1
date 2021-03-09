@@ -54,7 +54,6 @@ class OpNovicePrimaryGeneratorMessenger: public G4UImessenger
   private:
     OpNovicePrimaryGeneratorAction* fOpNoviceAction;
     G4UIdirectory*                  fGunDir;
-    G4UIcmdWithADoubleAndUnit*      fPolarCmd;
     G4UIcmdWithAString*             fSourceCmd;
 };
 

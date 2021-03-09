@@ -49,18 +49,9 @@ OpNovicePrimaryGeneratorMessenger::
   fGunDir->SetGuidance("PrimaryGenerator control");
 
   fSourceCmd = new G4UIcmdWithAString("/OpNovice/gun/optSource",this);
-  fSourceCmd->SetGuidance("Set source type to either gun or gps");
+  fSourceCmd->SetGuidance("Set source type: gun, gps, vert-inc-scan, norm-inc-scan, angle-scan");
   fSourceCmd->SetDefaultValue("gun");
   
-  fPolarCmd =
-           new G4UIcmdWithADoubleAndUnit("/OpNovice/gun/optPhotonPolar",this);
-  fPolarCmd->SetGuidance("Set linear polarization");
-  fPolarCmd->SetGuidance("  angle w.r.t. (k,n) plane");
-  fPolarCmd->SetParameterName("angle",true);
-  fPolarCmd->SetUnitCategory("Angle");
-  fPolarCmd->SetDefaultValue(-360.0);
-  fPolarCmd->SetDefaultUnit("deg");
-  fPolarCmd->AvailableForStates(G4State_Idle);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -77,21 +68,10 @@ OpNovicePrimaryGeneratorMessenger::~OpNovicePrimaryGeneratorMessenger()
 void OpNovicePrimaryGeneratorMessenger::SetNewValue(
                                         G4UIcommand* command, G4String newValue)
 {
-  if ( command == fSourceCmd ){
-    if ( newValue == "gps" || newValue == "gun" ) {
-      fOpNoviceAction->SetSourceType( newValue );
-    } else {
-      std::cout<<"OpNovicePrimaryGeneratorMessenger::SetNewValue "
-	       <<newValue<<" is neither gps nor gun" <<std::endl;
-    }
-  } else if( command == fPolarCmd ) {
-      G4double angle = fPolarCmd->GetNewDoubleValue(newValue);
-      if ( angle == -360.0*deg ) {
-         fOpNoviceAction->SetOptPhotonPolar();
-      } else {
-         fOpNoviceAction->SetOptPhotonPolar(angle);
-      }
-  }
+  
+  
+  fOpNoviceAction->SetSourceType( newValue );
+  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
