@@ -94,7 +94,10 @@ void OpNovicePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   const double scan_dy = (scan_ymax - scan_ymin) / scan_ny;
 
   if ( fSourceType == "gun" ){
-    //std::cout<<"OpNovicePrimaryGeneratorAction: using gun source ... doing normal incidence scan"<<std::endl;
+    fParticleGun->GeneratePrimaryVertex(anEvent);
+
+  } else if ( fSourceType == "vert-inc-scan" ){
+    
     fParticleGun->SetNumberOfParticles( 10000 );
     fParticleGun->SetParticleDefinition( G4ParticleTable::GetParticleTable()->FindParticle("opticalphoton") );
     int nparticles = fParticleGun->GetNumberOfParticles();
@@ -108,14 +111,21 @@ void OpNovicePrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     double xloc = scan_xmin + ix * scan_dx;
     double yloc = scan_ymin + iy * scan_dy;
     
-    fParticleGun->SetParticlePosition( G4ThreeVector( xloc, yloc, 2.0*CLHEP::cm ) );
+    G4ThreeVector loc = fParticleGun->GetParticlePosition();
+
+    fParticleGun->SetParticlePosition( G4ThreeVector( xloc, yloc, loc.z() ) );
     fParticleGun->GeneratePrimaryVertex(anEvent);
     scan_location = (++scan_location) % scan_N;
     //if ( scan_location % 100 == 0 ){
       std::cout<<"scan_location="<<scan_location<<" of "<<scan_N<<std::endl;
-      std::cout<<"Generating "<<nparticles<<" at "<<xloc/CLHEP::cm<<", "<<yloc/CLHEP::cm<<", 2.0 cm"<<std::endl;
+      std::cout<<"Generating "<<nparticles<<" at "<<xloc/CLHEP::cm<<", "<<yloc/CLHEP::cm<<", "<<loc.z()/CLHEP::cm<<"  cm"<<std::endl;
       //}
 
+  } else if ( fSourceType == "norm-inc-scan" ){
+
+
+  } else if ( fSourceType == "angle-scan" ){
+      
   } else if ( fSourceType == "gps" ) {
     std::cout<<"OpNovicePrimaryGeneratorAction: using gps source"<<std::endl;
     int numpart = fParticleGPS->GetNumberOfParticles();
