@@ -408,7 +408,7 @@ void R3600Geometry::BuildAcrylic() {
 
   G4LogicalVolume * frp_log = new G4LogicalVolume( frpsum5, fMaterials["frp"], os.str().c_str() );
   //G4LogicalVolume * frp_log = new G4LogicalVolume( frpsum3, fMaterials["frp"], os.str().c_str() );
-  frp_log->SetVisAttributes( G4VisAttributes( G4Color::Brown() ) );
+  frp_log->SetVisAttributes( G4VisAttributes( G4Color::Green() ) );
   
   
 
