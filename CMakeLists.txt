@@ -20,6 +20,17 @@ endif()
 #
 include(${Geant4_USE_FILE})
 
+#   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+
+#---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
+find_package(ROOT REQUIRED COMPONENTS RIO Net)
+
+#---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
+include(${ROOT_USE_FILE})
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 #
@@ -32,7 +43,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(OpNovice OpNovice.cc ${sources} ${headers})
-target_link_libraries(OpNovice ${Geant4_LIBRARIES} )
+target_link_libraries(OpNovice ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} )
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
@@ -45,6 +56,9 @@ set(OpNovice_SCRIPTS
     optPhoton.mac
     gui.mac
     vis.mac
+    ptf-geom.txt
+    ptf-materials.txt
+    ptf-optsurfaces.txt
   )
 
 foreach(_script ${OpNovice_SCRIPTS})

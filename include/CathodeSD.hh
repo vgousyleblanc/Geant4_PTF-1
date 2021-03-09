@@ -15,16 +15,18 @@
 class CathodeSD : public G4VSensitiveDetector {
 public:
   
-  CathodeSD( G4String aname );
-  ~CathodeSD(){;}
+  CathodeSD( unsigned pmtid, G4String aname );
+  ~CathodeSD(){}
   
   G4bool ProcessHits( G4Step * , G4TouchableHistory *  );
   void   Initialize( G4HCofThisEvent * );
   void   EndOfEvent( G4HCofThisEvent * );
 
   G4String get_name() const { return fName ; }
+  unsigned get_pmtid() const { return pmtID; }
 private:
   int      collectionID;
+  int      pmtID;
   G4String fName;
   PhotonCathodeHC * fHits;
 };

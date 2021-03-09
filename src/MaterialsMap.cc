@@ -395,6 +395,17 @@ void MaterialsMap::BuildMaterials(){
        1.000291, 1.000292, 1.000293, 1.000295,
        1.000296, 1.000299, 1.000301, 1.000304,
        1.000308, 1.000312, 1.000316, 1.000320};
+   G4double ABSLEN_air[NUMENTRIES_water] =
+     { 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
+       10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m};
    G4double RAYLEIGH_air[NUMENTRIES_water] =
      { 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
        10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 10000.0*CLHEP::m, 
@@ -420,6 +431,7 @@ void MaterialsMap::BuildMaterials(){
    G4double MIE_air_const[3]={0.99,0.99,0.8};// gforward, gbackward, forward backward ratio
    G4MaterialPropertiesTable *myMPT2 = new G4MaterialPropertiesTable();
    myMPT2->AddProperty("RINDEX",    ENERGY_water, RINDEX_air,          NUMENTRIES_water);
+   myMPT2->AddProperty("ABSLENGTH",  ENERGY_water, ABSLEN_air,         NUMENTRIES_water);
    myMPT2->AddProperty("RAYLEIGH",  ENERGY_water, RAYLEIGH_air,        NUMENTRIES_water);
    //myMPT2->AddProperty("MIEHG",     ENERGY_water, MIE_air,             NUMENTRIES_water);
    //myMPT2->AddConstProperty("MIEHG_FORWARD",MIE_air_const[0]);

@@ -39,7 +39,7 @@ R3600Geometry::~R3600Geometry(){
     G4VPhysicalVolume * curphysvol = curpair.second;
     delete curphysvol;
   }
-  if ( fSD != nullptr ) delete fSD;
+  //if ( fSD != nullptr ) delete fSD;
 }
 
   /*
@@ -76,7 +76,7 @@ void R3600Geometry::get_solid( G4VSolid & vol, G4RotationMatrix& rm, G4ThreeVect
   */
 
   
-void R3600Geometry::attachSD(){
+void R3600Geometry::attachSD( int pmtID ){
   // Add sensitive detector to Cathode
   G4VPhysicalVolume * cath_phys = fVols[ "cathode" ];
   G4LogicalVolume * cath_log = cath_phys->GetLogicalVolume();
@@ -86,7 +86,7 @@ void R3600Geometry::attachSD(){
   //
   //} else {
   std::cout<<"Building sensitive detector with name "<<cath_phys->GetName()<<std::endl;
-  fSD = new CathodeSD( cath_phys->GetName() );
+  fSD = new CathodeSD( pmtID, cath_phys->GetName() );
   cath_log->SetSensitiveDetector( fSD );
 
   //}
@@ -408,7 +408,7 @@ void R3600Geometry::BuildAcrylic() {
 
   G4LogicalVolume * frp_log = new G4LogicalVolume( frpsum5, fMaterials["frp"], os.str().c_str() );
   //G4LogicalVolume * frp_log = new G4LogicalVolume( frpsum3, fMaterials["frp"], os.str().c_str() );
-  frp_log->SetVisAttributes( G4VisAttributes( G4Color::Brown() ) );
+  frp_log->SetVisAttributes( G4VisAttributes( G4Color::Green() ) );
   
   
 

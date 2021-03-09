@@ -33,6 +33,8 @@
 
 #include "OpNoviceRunAction.hh"
 
+#include "HistoManager.hh"
+
 #include "G4Run.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -63,6 +65,11 @@ void OpNoviceRunAction::BeginOfRunAction(const G4Run* aRun)
 
 void OpNoviceRunAction::EndOfRunAction(const G4Run* aRun)
 {
+  std::cout<<"OpNoviceRunAction -- WriteHistograms underway"<<std::endl;
+  HistoManager* hman = HistoManager::GetManager();
+  hman->WriteHistograms();
+
+  
   fTimer->Stop();
   G4cout << "number of event = " << aRun->GetNumberOfEvent()
          << " " << *fTimer << G4endl;

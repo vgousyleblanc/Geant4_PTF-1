@@ -34,6 +34,7 @@
 #include "OpNoviceSteppingAction.hh"
 #include "OpNoviceStackingAction.hh"
 #include "OpNoviceSteppingVerbose.hh"
+#include "PTFDigitizeEvent.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -61,6 +62,7 @@ void OpNoviceActionInitialization::Build() const
   SetUserAction(new OpNoviceRunAction());
   SetUserAction(new OpNoviceSteppingAction());
   SetUserAction(new OpNoviceStackingAction());
+  SetUserAction(new PTFDigitizeEvent());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
